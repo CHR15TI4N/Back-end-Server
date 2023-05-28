@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node atividade_TDE10-05.js",
-    "dev": "nodemon atividade_TDE10-05.js"  
+    "start": "node index.js",
+    "dev": "nodemon index.js"  
   },
   "author": "",
   "license": "ISC",

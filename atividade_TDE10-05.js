@@ -12,11 +12,15 @@ let tasks = [
     }
 ]
 
-server.get("/tasks", (req, res) => {
+/*server.get("/tasks", (req, res) => {
+    //http:localhost/3030/tasks?more_than=qdaw
+    const moreThan = req.query.more_than ? Number(req.query.more_than) : 0;
     res.json({
-        tasks
+        tasks: tasks.filter((task) => {
+            return moreThan < task.name
+        })
     })
-})
+})*/
 
 server.get("/tasks/:id", (req, res) => {
     const id = Number(req.params.id)
