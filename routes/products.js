@@ -1,5 +1,5 @@
 const express = require("express");
-const {saveProduct, getAllProducts} = require("../database/products");
+const {saveProduct, getAllProducts, getProductById, updateProduct, deleteProduct} = require("../database/products");
 const router = express.Router();
 
 let products = [
@@ -28,11 +28,9 @@ router.get("/products", async (req, res) => {
     })
 })
 
-router.get("/products/:id", (req, res) => {
+router.get("/products/:id", async (req, res) => {
     const id = Number(req.params.id)
-    const product = products.find((product) => {
-        return product.id === id;
-    })
+    const product = await getProductById(id);
     res.json({
         product
     })
@@ -49,27 +47,21 @@ router.post("/products", async (req, res) => {
     })
 })
 
-router.put("/products/:id", (req, res) => {
+router.put("/products/:id", async (req, res) => {
     const id = Number(req.params.id)
-    const product = products.find((product) => {
-        return product.id === id;
-    })
-    if(!product){
-        res.status(404).send();
-        return;
+    const product = {
+        name: req.body.name,
+        price: req.body.price
     }
-    product.name = req.body.name;
-    product.price = req.body.price;
+    const updatedProduct = await updateProduct(id, product);
     res.json({
-        product
+        product: updatedProduct
     })
 })
 
-router.delete("/products/:id", (req, res) => {
+router.delete("/products/:id", async (req, res) => {
     const id = Number(req.params.id);
-    products = products.filter((product) => {
-        return product.id !== id;
-    })
+    await deleteProduct(id)
     res.status(204).send();
 })
 
