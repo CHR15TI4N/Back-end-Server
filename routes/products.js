@@ -2,24 +2,6 @@ const express = require("express");
 const {saveProduct, getAllProducts, getProductById, updateProduct, deleteProduct} = require("../database/products");
 const router = express.Router();
 
-let products = [
-    {
-        id: 1,
-        name: "ps4",
-        price: 2500
-    },
-    {
-        id: 2, 
-        name: "nintendo switch",
-        price: 2300
-    },
-    {
-        id: 3,
-        name: "xbox",
-        price: 2500
-    }
-]
-
 router.get("/products", async (req, res) => {
     const moreThan = req.query.more_than ? Number(req.query.more_than) : 0;
     const products = await getAllProducts(moreThan);
