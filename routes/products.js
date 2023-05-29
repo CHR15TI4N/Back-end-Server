@@ -1,4 +1,5 @@
 const express = require("express");
+const {saveProduct, getAllProducts} = require("../database/products");
 const router = express.Router();
 
 let products = [
@@ -19,12 +20,11 @@ let products = [
     }
 ]
 
-router.get("/products", (req, res) => {
+router.get("/products", async (req, res) => {
     const moreThan = req.query.more_than ? Number(req.query.more_than) : 0;
+    const products = await getAllProducts(moreThan);
     res.json({
-        products: products.filter((product) => {
-            return moreThan < product.price
-        })
+        products
     })
 })
 
@@ -38,15 +38,14 @@ router.get("/products/:id", (req, res) => {
     })
 }) 
 
-router.post("/products", (req, res) => {
+router.post("/products", async (req, res) => {
     const newProducts = {
-        id: products.length + 1,
         name: req.body.name,
         price: req.body.price
     }
-    products.push(newProducts)
+    const savedProduct = await saveProduct(newProducts)
     res.json({
-        product: newProducts
+        product: savedProduct
     })
 })
 
