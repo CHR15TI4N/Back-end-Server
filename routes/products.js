@@ -1,5 +1,5 @@
 const express = require("express");
-const {saveProduct, getAllProducts, getProductById, updateProduct, deleteProduct} = require("../database/products");
+const {saveProduct, getAllProducts, getProductById, updateProduct, deleteProduct, buyProductByUser} = require("../database/products");
 const auth = require("../middleware/auth");
 const router = express.Router();
 
@@ -47,6 +47,17 @@ router.delete("/products/:id", auth, async (req, res) => {
     await deleteProduct(id)
     res.status(204).send();
 })
+
+router.post("/products/buy", auth, async (req, res) => {
+    const user = req.user;
+    const productAndQuantity = req.body.products;
+    for (let item of productAndQuantity) {
+      await buyProductByUser(user.userId, item.id, item.quantity);
+    }
+    res.status(201).json({
+      success: true,
+    });
+  });
 
 module.exports = {
     router

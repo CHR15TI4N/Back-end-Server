@@ -1,6 +1,7 @@
 const express = require("express");
 const { saveUser, findUserByEmail, findUserById } = require("../database/users");
 const bcrypt = require("bcrypt");
+const z = require("zod");
 const jwt = require("jsonwebtoken");
 const auth = require("../middleware/auth");
 const router = express.Router();
