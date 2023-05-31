@@ -6,35 +6,42 @@ const jwt = require("jsonwebtoken");
 const auth = require("../middleware/auth");
 const router = express.Router();
 
-router.post("/register", async (req, res) => {
+const userSchema = z.object({
+    name: z.string().min(3),
+    email: z.string().email(),
+    password: z.string().min(6),
+    age: z.number().optional(),
+  });
+
+  router.post("/register", async (req, res) => {
     try {
-        const isEmailAlreadyUsed = await findUserByEmail(req.body.email);
-        if(isEmailAlreadyUsed) 
-            return res.status(400).json({
-                massage: "Email already is being used."
-            })
-        const hashedPassword = bcrypt.hashSync(req.body.password, 10);
-        const user = {
-            name: req.body.name,
-            email: req.body.email,
-            password: hashedPassword
-        };
-        const savedUser = await saveUser(user);
-        delete savedUser.password;
-        res.status(201).json({
-            user: savedUser
+      const user = userSchema.parse(req.body);
+      const isEmailAlreadyUsed = await findUserByEmail(user.email);
+      if (isEmailAlreadyUsed)
+        return res.status(400).json({
+          message: "Email already is being used",
         });
-    } catch (error) {
-        res.status(500).json({
-            message: "Server error"
-        })
+      const hashedPassword = bcrypt.hashSync(req.body.password, 10);
+      user.password = hashedPassword;
+      const savedUser = await saveUser(user);
+      delete savedUser.password;
+      res.status(201).json({
+        user: savedUser,
+      });
+    } catch (err) {
+      if (err instanceof z.ZodError)
+        return res.status(422).json({
+          message: err.errors,
+        });
+      res.status(500).json({
+        message: "Server error",
+      });
     }
-})
+  });
 
 router.post("/login", async (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
-
     const user = await findUserByEmail(email);
     if (!user) return res.status(401).send();
 
@@ -60,6 +67,13 @@ router.get("/profile", auth, async (req, res) => {
         user
     })
 })
+
+router.get("/history", auth, async (req, res) => {
+    const user = await findUserById(req.user.userId);
+    res.json({
+        user,
+    });
+});
 
 module.exports = {
     router
